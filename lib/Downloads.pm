@@ -109,11 +109,18 @@ sub findMedia {
     
     my @mediaFiles;
     
+    CONTENT:
     for (@contents) {
         if ( -d ) {
             push @mediaFiles, $self->findMedia($_);
         }
-        elsif ( /(rar|r00)$/ ) {
+        elsif ( /(rar|r00)$/i ) {
+            if ( /r00$/i ) {
+                #look for a rar, we'd rather act on that
+                for (@contents) {
+                    next CONTENT if /rar$/i;
+                }
+            }
             for ( $self->unpackRar($_) ) {
                 push @contents, $dir.'/'.$_;
             }
