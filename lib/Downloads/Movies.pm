@@ -49,7 +49,7 @@ sub processMovies {
     #Get all the shows that we track.
     my @vidFiles = $self->findMedia($self->{moviesDownloadDir});
     
-    $log->info("\tMOVIES: Procesing Downloads:");
+    $log->info("MOVIES: Procesing Downloads:");
 
     FILE:
     for my $file ( @vidFiles ) {
