@@ -26,7 +26,7 @@ Log::Any::Adapter->set( 'Dispatch', dispatcher => $log );
 $SIG{__DIE__} = sub { $log->crit($_[0]) };
 
 #Get Cmd line opts
-my $cfgfile = '../etc/downloadManager.conf';
+my $cfgfile = '/etc/downloadManager.conf';
 my $optsOk = GetOptions( 'cfgfile|c=s' => \$cfgfile, );
 die "Invalid options.\n" unless $optsOk;
 
