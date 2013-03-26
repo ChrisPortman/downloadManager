@@ -43,7 +43,7 @@ else {
 
 my $deluge = Api::Deluge->new($config);
 $deluge->login();
-#$deluge->getTorrents();
+$deluge->getTorrents();
 
 exit;
     

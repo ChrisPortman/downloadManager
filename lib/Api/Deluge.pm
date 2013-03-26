@@ -45,6 +45,8 @@ sub login {
     
     if ( my $result = $self->_callApi( \%content ) ) {
         $log->info( Dumper($result) );
+        my $uaResponse = $result->{'response'};
+        $self->{'authCookie'} = $uaResponse->header('set-cookie');
         return 1;
     }
     else {
@@ -90,6 +92,7 @@ sub _callApi {
     my $can_accept = HTTP::Message::decodable;
     
     $ua->default_header( 'Accept-Encoding' => $can_accept );
+    $ua->default_header( 'Cookie' => $self->{'authCookie'} ) if $self->{'authCookie'};
     
     my $pass = $self->{'delugePass'};
     my $host = $self->{'delugeHost'};
