@@ -44,7 +44,6 @@ sub login {
     );
     
     if ( my $result = $self->_callApi( \%content ) ) {
-        $log->info( Dumper($result) );
         return 1;
     }
     else {
@@ -66,8 +65,7 @@ sub getTorrents {
     );
     
     if ( my $result = $self->_callApi( \%content ) ) {
-        $log->info( Dumper($result) );
-        return 1;
+        return wantarray ? %{$result->{'torrents'}} : $result->{'torrents'};
     }
     else {
         $log->error("Deluge API call failed.");
@@ -99,7 +97,6 @@ sub _callApi {
     my $delugeApiUri = 'http://'.$host.':'.$port.'/json';
   
     my $result = $client->call($delugeApiUri, $content);    
-    $log->info(Dumper($result));
     
     #Check the result.
     if($result) {
@@ -121,7 +118,7 @@ sub _callApi {
         }
     }
     
-    return 1;
+    return;
 } 
 
 

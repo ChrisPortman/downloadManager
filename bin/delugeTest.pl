@@ -9,6 +9,7 @@ use Getopt::Long;
 use Config::Auto;
 use Log::Dispatch;
 use Log::Any::Adapter;
+use Data::Dumper;
 
 #Our modules
 use Api::Xbmc;
@@ -42,8 +43,10 @@ else {
 }
 
 my $deluge = Api::Deluge->new($config);
+
 $deluge->login();
-$deluge->getTorrents();
+
+print Dumper($deluge->getTorrents())."\n";
 
 exit;
     
