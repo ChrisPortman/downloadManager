@@ -46,7 +46,8 @@ my $deluge = Api::Deluge->new($config);
 
 $deluge->login();
 
-print Dumper($deluge->getTorrents())."\n";
+my $torrents = $deluge->getTorrents();
+print Dumper($torrents)."\n";
 
 exit;
     
