@@ -60,7 +60,7 @@ sub getTorrents {
     my %content = (
         'jsonrpc' => '2.0',
         'method'  => 'web.update_ui',
-        'params'  => [['name','state','tracker_host'],{}],
+        'params'  => [['name','state','tracker_host','save_path'],{}],
         "id"      => $self->{'callId'}++,
     );
     

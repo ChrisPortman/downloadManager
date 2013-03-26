@@ -37,6 +37,8 @@ my $config;
 if ( -f $cfgfile ) {
     my $confObj = Config::Auto->new( source => $cfgfile );
     $config = $confObj->parse();
+    print "CONFIG:\n";
+    print Dumper($config)."\n";
 }
 else {
     die "The config file ($cfgfile) does not exist.\n";
@@ -48,6 +50,24 @@ $deluge->login();
 
 my $torrents = $deluge->getTorrents();
 print Dumper($torrents)."\n";
+
+TORRENT:
+for ( keys %{$torrents} ) {
+    my $tor = $torrents->{$_};
+    next unless $tor->{'state'} =~ /seeding/i;
+    my @seedTrackers = ref( $config->{'seedTrackers'} )
+                       ? @{ $config->{'seedTrackers'} }
+                       :  ( $config->{'seedTrackers'} );
+    
+    for my $tracker (@seedTrackers) {
+        if ( $tracker =~ /$tor->{'tracker_host'}/ ) {
+            print "Would NOT delete ".$tor->{'name'}."\n";
+            next TORRENT;
+        }
+    }
+    
+    print "Would continue to delete ".$tor->{'name'}."\n";
+}
 
 exit;
     
