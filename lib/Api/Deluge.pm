@@ -45,8 +45,6 @@ sub login {
     
     if ( my $result = $self->_callApi( \%content ) ) {
         $log->info( Dumper($result) );
-        my $uaResponse = $result->{'response'};
-        $self->{'authCookie'} = $uaResponse->header('set-cookie');
         return 1;
     }
     else {
@@ -105,11 +103,15 @@ sub _callApi {
     
     #Check the result.
     if($result) {
-        if ($result->is_error) {
-            return;
+        if ($result->is_success) {
+            my $uaResponse = $result->{'response'};
+            my $cookie = $uaResponse->header('set-cookie');
+            $self->{'authCookie'} = $cookie if $cookie;
+            
+            return $result->result();
         }
         else {
-            my $data = $result->result();
+            return;
         }
     }
     else {
