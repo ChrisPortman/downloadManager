@@ -52,8 +52,8 @@ my $torrents = $deluge->getTorrents();
 print Dumper($torrents)."\n";
 
 TORRENT:
-for ( keys %{$torrents} ) {
-    my $tor = $torrents->{$_};
+for my $torId ( keys %{$torrents} ) {
+    my $tor = $torrents->{$torId};
     next unless $tor->{'state'} =~ /seeding/i;
     my @seedTrackers = ref( $config->{'seedTrackers'} )
                        ? @{ $config->{'seedTrackers'} }
@@ -65,8 +65,9 @@ for ( keys %{$torrents} ) {
             next TORRENT;
         }
     }
+    print "Deleting ".$tor->{'name'}.'...';
     
-    print "Would continue to delete ".$tor->{'name'}."\n";
+    print $deluge->removeTorrent($torId, 1) ? "SUCCESS\n" : "FAILED\n";
 }
 
 exit;
