@@ -20,7 +20,7 @@ use Downloads::Movies;
 #Set up logging
 my $log = Log::Dispatch->new(
     outputs => [
-        [ 'Screen', min_level => 'info', newline => 1, ],
+        [ 'Screen', min_level => 'debug', newline => 1, ],
     ],
 );
 Log::Any::Adapter->set( 'Dispatch', dispatcher => $log );
@@ -45,8 +45,6 @@ else {
 }
 
 my $deluge = Api::Deluge->new($config);
-
-$deluge->login();
 
 my $torrents = $deluge->getTorrents();
 print Dumper($torrents)."\n";

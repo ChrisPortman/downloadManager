@@ -25,9 +25,10 @@ sub new {
         $usableArgs{$arg} = $args{$arg};
     }
     
-    $usableArgs{'callId'} = 1;
-    
     my $obj = bless \%usableArgs, $class;
+    $obj->{'rpcClient'} = JSON::RPC::Client->new();
+    $obj->{'callId'}    = 1;
+
     
     $obj->login();
     
@@ -47,16 +48,18 @@ sub login {
     
     if ( my $result = $self->_callApi( \%content ) ) {
         if ($result->is_success) {
+            $log->debug("Deluge Login success");
             return 1;
         }
         else {
+            $log->debug("Deluge Login failed");
             my $error = $result->error_message();
             $self->error($error) if $error;
             return;
         }
     }
     else {
-        $log->error("Deluge API call failed.");
+        $log->error("Login: Deluge API call failed.");
         return;
     }
     
@@ -78,9 +81,15 @@ sub getTorrents {
             $result = $result->result();
             return wantarray ? %{$result->{'torrents'}} : $result->{'torrents'};
         }
+        else {
+            my $error = $result->error_message();
+            $self->error($error) if $error;
+            $log->error("GetTorrents: Deluge API call failed: $error.");
+            return;
+        }
     }
-        
-    $log->error("Deluge API call failed.");
+
+    $log->error("GetTorrents: Deluge API call failed: Unknown error.");
     return;
 }
 
@@ -111,7 +120,7 @@ sub removeTorrent {
         return 1
     }
     else {
-        $log->error("Deluge API call failed.");
+        $log->error("RemoveTorrents: Deluge API call failed.");
         return;
     }
     
@@ -126,13 +135,8 @@ sub _callApi {
         die "Content must be a hash ref for _callApi.\n";
     }
     
-    my $client     = JSON::RPC::Client->new();
-    my $ua         = $client->ua();
-    my $can_accept = HTTP::Message::decodable;
-    
-    $ua->default_header( 'Accept-Encoding' => $can_accept );
-    $ua->default_header( 'Cookie' => $self->{'authCookie'} ) if $self->{'authCookie'};
-    
+    my $client = $self->{'rpcClient'};
+
     my $pass = $self->{'delugePass'};
     my $host = $self->{'delugeHost'};
     my $port = $self->{'delugePort'};
@@ -143,15 +147,10 @@ sub _callApi {
     
     #Check the result.
     if($result) {
-        if ($result->is_success) {
-            my $uaResponse = $result->{'response'};
-            my $cookie = $uaResponse->header('set-cookie');
-            $self->{'authCookie'} = $cookie if $cookie;
-        }
-        else {
+        unless ($result->is_success) {
             return;
         }
-        
+
         #Return the full result regardless of error and let the original
         #method determine how to deal with it.
         return $result;
@@ -162,7 +161,6 @@ sub _callApi {
             return;
         }
     }
-    
     return;
 } 
 
