@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use lib '../lib';
+use File::Path qw(remove_tree);
 
 #3rd Pty Modules
 use Getopt::Long;
@@ -14,6 +15,10 @@ use Log::Any::Adapter;
 use Api::Xbmc;
 use Downloads::Tv;
 use Downloads::Movies;
+
+#-------------#
+#---SETUP-----#
+#-------------#
 
 #Set up logging
 my $log = Log::Dispatch->new(
@@ -40,6 +45,62 @@ else {
     die "The config file ($cfgfile) does not exist.\n";
 }
 
+#-------------#
+#----SUBS-----#
+#-------------#
+sub removeTorrents {
+    my $deluge = Api::Deluge->new($config);
+    my $torrents = $deluge->getTorrents();
+    
+    TORRENT:
+    for my $torId ( keys %{$torrents} ) {
+        my $tor = $torrents->{$torId};
+        next unless $tor->{'state'} =~ /seeding/i;
+        my @seedTrackers = ref( $config->{'seedTrackers'} )
+                           ? @{ $config->{'seedTrackers'} }
+                           :  ( $config->{'seedTrackers'} );
+        
+        for my $tracker (@seedTrackers) {
+            if ( $tracker =~ /$tor->{'tracker_host'}/ ) {
+                $log->debug("NOT deleting ".$tor->{'name'});
+                next TORRENT;
+            }
+        }
+        $log->info("Deleting ".$tor->{'name'}.'...');
+        
+        deleteDir($tor->{'save_path'}.'/'.$tor->{'name'})
+          or $log->warn('Failed to delete torrent Data @ '.$tor->{'save_path'}.'/'.$tor->{'name'});
+        
+        print $deluge->removeTorrent($torId, 1) 
+          ? $log->info("\tSUCCESS") 
+          : $log->info("\tFAILED");
+    }
+}
+
+sub deleteDir {
+    my $dir = shift or return;
+    
+    unless (    $config->{'tvDownloadDir'} =~ /$dir/
+             or $config->{'moviesDownloadDir'} =~ /$dir/ ) 
+    {
+        $log->warn("$dir does not look like a directory we would download to. I'm not deleting it");
+        return;
+    }
+    
+    if ( -d $dir ) {
+        unless ( remove_tree($dir) ) {
+          $log->warn("Could not delete $dir: $!");
+          return;
+        }
+    }
+    
+    return 1;
+}
+
+#-------------#
+#----MAIN-----#
+#-------------#
+
 #Set up some objects
 my $tv     = Downloads::Tv->new($config);
 my $movies = Downloads::Movies->new($config);
@@ -52,6 +113,9 @@ $tv->processTv();
 
 $log->info('Checking for Movies');
 $movies->processMovies();
+
+#Clean up torrents
+
 
 #See if we did stuff.  If we did, XBMC needs updating
 if ( $tv->filesProcessed() or $movies->filesProcessed() ) {

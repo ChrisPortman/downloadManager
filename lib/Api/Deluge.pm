@@ -29,6 +29,8 @@ sub new {
     
     my $obj = bless \%usableArgs, $class;
     
+    $obj->login();
+    
     return $obj;
 }
 
