@@ -1,9 +1,17 @@
 #!/usr/bin/env perl
 
+#Core Modules
 use strict;
 use warnings;
-use lib '../lib';
 use File::Path qw(remove_tree);
+
+my $path;
+BEGIN {
+    #Get the lib dir relative to this file.
+    use Cwd 'abs_path';
+    ($path) = abs_path($0) =~ m|^(.+/)[^/]+$|;
+}
+use lib $path.'../lib';
 
 #3rd Pty Modules
 use Getopt::Long;
@@ -13,6 +21,7 @@ use Log::Any::Adapter;
 
 #Our modules
 use Api::Xbmc;
+use Api::Deluge;
 use Downloads::Tv;
 use Downloads::Movies;
 
@@ -93,6 +102,12 @@ sub deleteDir {
           return;
         }
     }
+    elsif ( -f $dir or -l $dir ) {
+        unless (unlink $dir) {
+          $log->warn("Could not delete $dir: $!");
+          return;
+        }
+    }
     
     return 1;
 }
@@ -115,7 +130,7 @@ $log->info('Checking for Movies');
 $movies->processMovies();
 
 #Clean up torrents
-
+removeTorrents();
 
 #See if we did stuff.  If we did, XBMC needs updating
 if ( $tv->filesProcessed() or $movies->filesProcessed() ) {
