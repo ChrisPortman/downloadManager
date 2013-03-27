@@ -44,7 +44,14 @@ sub login {
     );
     
     if ( my $result = $self->_callApi( \%content ) ) {
-        return 1;
+        if ($result->is_success) {
+            return 1;
+        }
+        else {
+            my $error = $result->error_message();
+            $self->error($error) if $error;
+            return;
+        }
     }
     else {
         $log->error("Deluge API call failed.");
@@ -65,7 +72,41 @@ sub getTorrents {
     );
     
     if ( my $result = $self->_callApi( \%content ) ) {
-        return wantarray ? %{$result->{'torrents'}} : $result->{'torrents'};
+        if ($result->is_success) {
+            $result = $result->result();
+            return wantarray ? %{$result->{'torrents'}} : $result->{'torrents'};
+        }
+    }
+        
+    $log->error("Deluge API call failed.");
+    return;
+}
+
+sub removeTorrent {    
+    my $self = shift;
+    my $id   = shift or croak "removeTorrent() requires a torrent ID\n";
+    my $data = shift;
+    
+    $data = $data ? 1 : 0; #Make a definate bool.
+  
+    my %content = (
+        'jsonrpc' => '2.0',
+        'method'  => 'core.remove_torrent',
+        'params'  => ["$id", $data],
+        "id"      => $self->{'callId'}++,
+    );
+    
+    if ( my $result = $self->_callApi( \%content ) ) {
+        if ($result->is_success) {
+            return 1;
+        }
+        else {
+            my $error = $result->error_message();
+            $self->error($error) if $error;
+            return;
+        }
+
+        return 1
     }
     else {
         $log->error("Deluge API call failed.");
@@ -104,12 +145,14 @@ sub _callApi {
             my $uaResponse = $result->{'response'};
             my $cookie = $uaResponse->header('set-cookie');
             $self->{'authCookie'} = $cookie if $cookie;
-            
-            return $result->result();
         }
         else {
             return;
         }
+        
+        #Return the full result regardless of error and let the original
+        #method determine how to deal with it.
+        return $result;
     }
     else {
         $result = $client->status_line;
@@ -121,5 +164,15 @@ sub _callApi {
     return;
 } 
 
+sub error {
+    my $self  = shift;
+    my $error = shift;
+    
+    my $return = $self->{'error'};
+    $self->{'error'} = $error;
+    
+    return $return;
+}
+    
 
 1;
