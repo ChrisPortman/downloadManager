@@ -69,10 +69,12 @@ sub removeTorrents {
                            ? @{ $config->{'seedTrackers'} }
                            :  ( $config->{'seedTrackers'} );
         
-        for my $tracker (@seedTrackers) {
-            if ( $tracker =~ /$tor->{'tracker_host'}/ ) {
-                $log->debug("NOT deleting ".$tor->{'name'});
-                next TORRENT;
+        if (@seedTrackers) {
+            for my $tracker (@seedTrackers) {
+                if ( $tracker =~ /$tor->{'tracker_host'}/ ) {
+                    $log->debug("NOT deleting ".$tor->{'name'});
+                    next TORRENT;
+                }
             }
         }
         $log->info("Deleting ".$tor->{'name'}.'...');

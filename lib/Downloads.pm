@@ -204,7 +204,9 @@ sub unsort {
     rename $source, $dest
       or die "Could not move $source to $dest: $!\n";
     
-    if ($self->{'symlink'}) {
+    if ($self->{'symlinks'}) {
+        $log->info("\t\tCreating symlink. NOTE: When you come to sort manually, you will need to update the symlink!");
+        $log->debug("\t\tLinking $dest to $source");
         symlink $dest, $source
           or die "Could not create synlink from $dest to $source: $!\n";
     }
