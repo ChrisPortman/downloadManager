@@ -89,10 +89,12 @@ sub removeTorrents {
 }
 
 sub deleteDir {
-    my $dir = shift or return;
+    my $dir      = shift or return;
+    my $tvDir    = $config->{'tvDownloadDir'};
+    my $movieDir = $config->{'moviesDownloadDir'};
     
-    unless (    $config->{'tvDownloadDir'} =~ /$dir/
-             or $config->{'moviesDownloadDir'} =~ /$dir/ ) 
+    unless (    $dir =~ m{$tvDir}
+             or $dir =~ m{$movieDir} ) 
     {
         $log->warn("$dir does not look like a directory we would download to. I'm not deleting it");
         return;
