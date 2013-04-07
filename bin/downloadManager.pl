@@ -19,6 +19,7 @@ use Config::Auto;
 use Log::Dispatch;
 use Log::Any::Adapter;
 use MIME::Lite;
+use Data::Dumper;
 
 #Our modules
 use Api::Xbmc;
@@ -121,8 +122,9 @@ sub deleteDir {
 }
 
 sub createLogEmail {
-    my %args    = shift;
-    my $message = $args{'message'};
+    my $args    = shift;
+    $log->info( Dumper($args) );
+    my $message = $args->{'message'};
     
     $email .= $message."\n";
     
