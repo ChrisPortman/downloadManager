@@ -18,6 +18,7 @@ use Getopt::Long;
 use Config::Auto;
 use Log::Dispatch;
 use Log::Any::Adapter;
+use MIME::Lite;
 
 #Our modules
 use Api::Xbmc;
@@ -34,6 +35,7 @@ my $log = Log::Dispatch->new(
     outputs => [
         [ 'Screen', min_level => 'info', newline => 1, ],
     ],
+    callbacks => [ \&createLogEmail ],
 );
 Log::Any::Adapter->set( 'Dispatch', dispatcher => $log );
 
@@ -53,6 +55,8 @@ if ( -f $cfgfile ) {
 else {
     die "The config file ($cfgfile) does not exist.\n";
 }
+
+my $email;
 
 #-------------#
 #----SUBS-----#
@@ -116,9 +120,36 @@ sub deleteDir {
     return 1;
 }
 
+sub createLogEmail {
+    my %args    = shift;
+    my $message = $args{'message'};
+    
+    $email .= $message."\n";
+    
+    return $message;
+}
+
+sub sendEmail {
+    if ($config->{'mailLogTo'} ) {
+        my $msg = MIME::Lite->new(
+             From     =>'me@myhost.com',
+             To       =>'you@yourhost.com',
+             Subject  =>'Helloooooo, nurse!',
+             Data     =>"Torrent Complete!\n\n$email",
+        );
+        
+        $msg->send();
+        
+    }
+    
+    return 1;
+}
+
 #-------------#
 #----MAIN-----#
 #-------------#
+
+$SIG{__DIE__} = \&sendEmail;
 
 #Set up some objects
 my $tv     = Downloads::Tv->new($config);
@@ -142,6 +173,8 @@ if ( $tv->filesProcessed() or $movies->filesProcessed() ) {
     $log->info('Updating XBMC Library');
     $xbmc->updateLibrary();
 }
+
+
 
 exit;
     
