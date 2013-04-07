@@ -137,11 +137,8 @@ sub sendEmail {
              Subject  => 'Helloooooo, nurse!',
              Data     => "Torrent Complete!\n\n$email",
         );
-        
         $msg->send();
-        
     }
-    
     return 1;
 }
 
@@ -174,7 +171,6 @@ if ( $tv->filesProcessed() or $movies->filesProcessed() ) {
     $xbmc->updateLibrary();
 }
 
-
+sendEmail();
 
 exit;
-    
