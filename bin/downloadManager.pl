@@ -131,11 +131,12 @@ sub createLogEmail {
 
 sub sendEmail {
     if ($config->{'mailLogTo'} ) {
+        $log->info("Sending mail...");
         MIME::Lite->send('smtp', "localhost");
         my $msg = MIME::Lite->new(
              From     => 'bishop@portman.net.au',
              To       => $config->{'mailLogTo'},
-             Subject  => 'Helloooooo, nurse!',
+             Subject  => 'Torrent Complete!',
              Data     => "Torrent Complete!\n\n$email",
         );
         $msg->send();
