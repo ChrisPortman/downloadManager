@@ -146,6 +146,8 @@ sub storeFile {
     
     #build the Dir path if its not already there.
     my $path;
+    my $orig_umask = umask 0000 #Create Dirs as 777;
+    
     for my $part ( split(m|/|, $destDir) ) {
         $path .= "/$part";
         
@@ -156,7 +158,10 @@ sub storeFile {
         unless ( -d $path ) {
             die "$path does not exist and it should\n";
         }
-    } 
+    }
+    
+    #Done creating directories, restore the umask.
+    umask $orig_umask; 
     
     if ( -e $dest ) {
         $log->warn("$dest already exists. $source will be unsorted");
