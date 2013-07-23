@@ -146,7 +146,7 @@ sub storeFile {
     
     #build the Dir path if its not already there.
     my $path;
-    my $orig_umask = umask 0000 #Create Dirs as 777;
+    my $orig_umask = umask 0000; #Create Dirs as 777
     
     for my $part ( split(m|/|, $destDir) ) {
         $path .= "/$part";
