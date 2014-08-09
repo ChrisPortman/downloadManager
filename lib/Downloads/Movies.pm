@@ -10,6 +10,8 @@ use parent qw( Downloads );
 use Log::Any qw ( $log );
 use WWW::Mechanize;  #for now...
 
+my $OMDB_API_HOST = 'http://www.omdbapi.com/';
+
 sub new {
     my $class = shift;
     my %args  = ref $_[0] ? %{$_[0]} : @_;
@@ -60,24 +62,25 @@ sub processMovies {
         
         my ( $nfoFile, $imdbId, $movieDetails );
         
-        unless ($nfoFile = $self->findNfo($path)) {
-            $log->warn("\t\tNo nfo file with $fileNoPath, will be in unsorted");
-            $self->unsort($file);
-            next;
+        if ($nfoFile = $self->findNfo($path)) {
+          if ( $imdbId = $self->getImdbId($nfoFile) ) {
+            $movieDetails = $self->getImdbDetails($imdbId);
+          }
         }
-        
-        unless ( $imdbId = $self->getImdbId($nfoFile) ) {
-            $log->warn("\t\tNo IMDB ID for $fileNoPath, will be in unsorted");
-            $self->unsort($file);
-            next;
+
+        unless ($movieDetails) {
+          $log->warn("\t\tNo luck getting the movie details using an IMDB ID from an NFO.  Trying a manual search");
+          my ($title, $year) = $fileNoPath =~ /^(.+).(19\d\d|20\d\d)/;
+          $title =~ s/\./ /g;
+          $movieDetails = $self->getImdbDetails($title, $year);
         }
-        
-        unless ( $movieDetails = $self->getImdbDetails($imdbId) ) {
-            $log->warn("\t\tNo details from IMDB for $fileNoPath, will be in unsorted");
-            $self->unsort($file);
-            next;
+
+        unless ($movieDetails) {
+          $log->warn("\t\tHave not been able to find the movie in IMDB. Moving to unsorted");
+          $self->unsort($file);
+          next;
         }
-        
+
         my $title = $movieDetails->{title};
         my $year  = $movieDetails->{year};
         
@@ -152,19 +155,22 @@ sub getImdbId {
 sub getImdbDetails {
     #declare some vars
     my $self   = shift;
-    my $imdbID = shift;
+    my $search = shift;
+    my $year   = shift || undef;
     my %movieDetails;
     my $browser;
-    my $imdbUri;
+    my $uri;
     my $xml;
+
+    $uri  = $OMDB_API_HOST . '?r=xml&';
+    $uri .= $search =~ /^tt\d+$/ ? "i=$search" : "t=$search";
+    $uri .= "&y=$year" if $year; 
     
     #get the details of the movie in xml form.
-    $imdbUri = 'http://www.imdbapi.com/?r=xml&i=' . $imdbID;
     $browser = WWW::Mechanize->new( autocheck => 1, timeout => 10 );
-    $browser->get( $imdbUri )
+    $browser->get( $uri )
       or return 0;
     $xml = $browser->content();
-    
     #search throug the xml for the title and year
     if ( $xml =~ m|<movie\stitle="(.+)"\syear="(\d+)"|i ) {
         %movieDetails = ( title => $1,
