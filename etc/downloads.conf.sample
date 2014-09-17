@@ -1,0 +1,31 @@
+#Global Options
+fileOwn     = root
+fileGrp     = root
+fileMode    = 0666
+symlinks    = 1
+unsortedDir = /srv/deluge/Incoming/Unsorted
+
+#TV Options
+tvDownloadDir = /srv/deluge/Incoming/Complete/TV
+tvShowDir     = /srv/deluge/TV
+
+#Movie Options
+moviesDownloadDir = /srv/deluge/Incoming/Complete/Movies
+moviesDir         = /srv/deluge/Movies
+
+#XBMC options
+xbmcHost = %%XBMC_HOST%% 
+xbmcPort = %%XBMC_PORT%%
+xbmcUser = %%XBMC_USER%%
+xbmcPass = %%XBMC_PASS%%
+
+#Deluge options
+delugeHost = localhost
+delugePort = 8112
+delugePass = %%ADMIN_PASS%%
+
+#Seed Options
+seedTrackers = tracker.ipt.af, tracker.iptorrents.com, tracker.iptorrents.me, tracker.iptorrents.ru
+
+#Mailer options
+mailLogTo = %%EMAIL_ADDRESS%%
