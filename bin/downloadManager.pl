@@ -146,8 +146,8 @@ sub sendEmail {
 
         sendmail(
           Email::MIME->create(
-            header_str => [ To => $mail_to, From => 'deluge@portman.net.au'],
-            parts      => [ "Torrent Complete!", $email ],
+            header_str => [ To => $mail_to, From => 'deluge@portman.net.au', Subject => 'Torrent Complete!'],
+            parts      => [ "Torrent Complete!\n\n$email" ],
           ),
           {
             from => 'deluge@portman.net.au',
@@ -156,8 +156,6 @@ sub sendEmail {
               sasl_username => $mail_user,
               sasl_password => $mail_pass,
               helo          => $mail_helo,
-              debug => 1,
-           
             } ),
           },
         );
