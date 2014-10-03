@@ -19,6 +19,8 @@ use Config::Auto;
 use Log::Dispatch;
 use Log::Any::Adapter;
 use MIME::Lite;
+use Email::Sender::Simple qw(sendmail);
+use Email::Sender::Transport::SMTP qw();
 
 #Our modules
 use Api::Xbmc;
@@ -131,19 +133,38 @@ sub createLogEmail {
 
 sub sendEmail {
     if ($config->{'mailLogTo'} ) {
-        my $mail_server = $config->{'mailServer'} || 'localhost';
-        my $mail_user   =  $config->{'mailUser'} || undef;
-        my $mail_pass   =  $config->{'mailPass'} || undef;
+        my $mail_server  = $config->{'mailServer'} || 'localhost';
+        my $mail_to      = $config->{'mailLogTo'};
+        my $mail_user    =  $config->{'mailUser'} || undef;
+        my $mail_pass    =  $config->{'mailPass'} || undef;
+        my $mail_subject = 'Torrent Complete!';
+        my $mail_message = "Torrent Complete\n\n$email";
 
         $log->info("Sending mail...");
-        MIME::Lite->send('smtp', $mail_server, AuthUser => $mail_user, AuthPass => $mail_pass);
-        my $msg = MIME::Lite->new(
-             From     => 'bishop@portman.net.au',
-             To       => $config->{'mailLogTo'},
-             Subject  => 'Torrent Complete!',
-             Data     => "Torrent Complete!\n\n$email",
+
+        sendmail(
+          Email::MIME->create(
+            header_str => [ To => $mail_to, From => 'deluge@portman.net.au',
+            parts      => [ "Torrent Complete!", $email ],
+          ),
+          {
+            from => 'deluge@portman.net.au',
+            transport => Email::Sender::Transport:SMTP->new( {
+              host => $mail_server,
+              port => '25',
+              sasl_username => $mail_user,
+              sasl_password => $mail_pass,
+           },
         );
-        $msg->send();
+
+#        MIME::Lite->send('smtp', $mail_server, AuthUser => $mail_user, AuthPass => $mail_pass);
+#        my $msg = MIME::Lite->new(
+#             From     => 'bishop@portman.net.au',
+#             To       => $config->{'mailLogTo'},
+#             Subject  => 'Torrent Complete!',
+#             Data     => "Torrent Complete!\n\n$email",
+#        );
+#        $msg->send();
     }
     return 1;
 }
