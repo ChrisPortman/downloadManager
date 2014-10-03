@@ -138,6 +138,7 @@ sub sendEmail {
         my $mail_to      = $config->{'mailLogTo'};
         my $mail_user    =  $config->{'mailUser'} || undef;
         my $mail_pass    =  $config->{'mailPass'} || undef;
+        my $mail_helo    =  $config->{'mailHelo'} || undef;
         my $mail_subject = 'Torrent Complete!';
         my $mail_message = "Torrent Complete\n\n$email";
 
@@ -154,7 +155,9 @@ sub sendEmail {
               host => $mail_server,
               sasl_username => $mail_user,
               sasl_password => $mail_pass,
+              helo          => $mail_helo,
               debug => 1,
+           
             } ),
           },
         );
