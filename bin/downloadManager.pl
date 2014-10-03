@@ -136,6 +136,7 @@ sub sendEmail {
     if ($config->{'mailLogTo'} ) {
         my $mail_server  = $config->{'mailServer'} || 'localhost';
         my $mail_to      = $config->{'mailLogTo'};
+        my $mail_from    = $config->{'mailFrom'};
         my $mail_user    =  $config->{'mailUser'} || undef;
         my $mail_pass    =  $config->{'mailPass'} || undef;
         my $mail_helo    =  $config->{'mailHelo'} || undef;

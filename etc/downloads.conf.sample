@@ -33,3 +33,4 @@ mailServer = %%SMTP_SERVER%%
 mailUser = %%SMTP_USER%%
 mailPass = %%SMTP_PASS%%
 mailLogTo = %%EMAIL_ADDRESS%%
+mailFrom = %%SMTP_FROM%%
