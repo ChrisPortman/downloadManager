@@ -150,12 +150,13 @@ sub sendEmail {
           ),
           {
             from => 'deluge@portman.net.au',
-            transport => Email::Sender::Transport:SMTP->new( {
+            transport => Email::Sender::Transport::SMTP->new( {
               host => $mail_server,
               port => '25',
               sasl_username => $mail_user,
               sasl_password => $mail_pass,
-           },
+            },
+          },
         );
 
 #        MIME::Lite->send('smtp', $mail_server, AuthUser => $mail_user, AuthPass => $mail_pass);
