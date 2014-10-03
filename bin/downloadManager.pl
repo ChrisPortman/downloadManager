@@ -145,7 +145,7 @@ sub sendEmail {
 
         sendmail(
           Email::MIME->create(
-            header_str => [ To => $mail_to, From => 'deluge@portman.net.au',
+            header_str => [ To => $mail_to, From => 'deluge@portman.net.au'],
             parts      => [ "Torrent Complete!", $email ],
           ),
           {
