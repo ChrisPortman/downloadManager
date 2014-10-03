@@ -152,7 +152,6 @@ sub sendEmail {
             from => 'deluge@portman.net.au',
             transport => Email::Sender::Transport::SMTP->new( {
               host => $mail_server,
-              port => '25',
               sasl_username => $mail_user,
               sasl_password => $mail_pass,
             } ),
