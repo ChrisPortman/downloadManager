@@ -29,4 +29,6 @@ seedTrackers = tracker.ipt.af, tracker.iptorrents.com, tracker.iptorrents.me, tr
 
 #Mailer options
 mailServer = %%SMTP_SERVER%%
+mailUser = %%SMTP_USER%%
+mailPass = %%SMTP_PASS%%
 mailLogTo = %%EMAIL_ADDRESS%%
