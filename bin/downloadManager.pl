@@ -141,7 +141,7 @@ sub sendEmail {
         my $mail_subject = 'Torrent Complete!';
         my $mail_message = "Torrent Complete\n\n$email";
 
-        $log->info("Sending mail...");
+        $log->info("Sending mail with server $mail_server...");
 
         sendmail(
           Email::MIME->create(
