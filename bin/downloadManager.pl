@@ -151,7 +151,7 @@ sub sendEmail {
             parts      => [ "Torrent Complete!\n\n$email" ],
           ),
           {
-            from => 'deluge@portman.net.au',
+            from => $mail_from,
             transport => Email::Sender::Transport::SMTP->new( {
               host => $mail_server,
               sasl_username => $mail_user,
