@@ -155,7 +155,7 @@ sub sendEmail {
               port => '25',
               sasl_username => $mail_user,
               sasl_password => $mail_pass,
-            },
+            } ),
           },
         );
 
