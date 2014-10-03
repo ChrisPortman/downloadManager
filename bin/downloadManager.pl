@@ -131,6 +131,8 @@ sub createLogEmail {
 
 sub sendEmail {
     if ($config->{'mailLogTo'} ) {
+        $mail_server = $config->{'mailServer'} || 'localhost';
+
         $log->info("Sending mail...");
         MIME::Lite->send('smtp', "localhost");
         my $msg = MIME::Lite->new(

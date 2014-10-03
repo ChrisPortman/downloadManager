@@ -28,4 +28,5 @@ delugePass = %%ADMIN_PASS%%
 seedTrackers = tracker.ipt.af, tracker.iptorrents.com, tracker.iptorrents.me, tracker.iptorrents.ru
 
 #Mailer options
+mailServer = %%SMTP_SERVER%%
 mailLogTo = %%EMAIL_ADDRESS%%
