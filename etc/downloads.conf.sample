@@ -3,7 +3,7 @@ fileOwn     = root
 fileGrp     = root
 fileMode    = 0666
 symlinks    = 1
-unsortedDir = /srv/deluge/Incoming/Unsorted
+unsortedDir = %%SORTFAILDIR%%
 
 #TV Options
 tvDownloadDir = /srv/deluge/Incoming/Complete/TV
