@@ -19,7 +19,7 @@ use Config::Auto;
 use Log::Dispatch;
 use Log::Any::Adapter;
 use MIME::Lite;
-#use Email::MIME;
+use Email::MIME;
 use Email::Sender::Simple qw(sendmail);
 use Email::Sender::Transport::SMTP qw();
 
