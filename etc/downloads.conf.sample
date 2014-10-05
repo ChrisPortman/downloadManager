@@ -6,12 +6,12 @@ symlinks    = 1
 unsortedDir = %%SORTFAILDIR%%
 
 #TV Options
-tvDownloadDir = /srv/deluge/Incoming/Complete/TV
-tvShowDir     = /srv/deluge/TV
+tvDownloadDir = %%COMPLETE_DOWLOADS%%/TV
+tvShowDir     = %%TVDIR%%
 
 #Movie Options
-moviesDownloadDir = /srv/deluge/Incoming/Complete/Movies
-moviesDir         = /srv/deluge/Movies
+moviesDownloadDir = %%COMPLETE_DOWLOADS%%/Movies
+moviesDir         = %%MOVIEDIR%%
 
 #XBMC options
 xbmcHost = %%XBMC_HOST%% 
