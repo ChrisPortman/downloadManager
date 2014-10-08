@@ -8,6 +8,7 @@ package Downloads::Tv;
 use Carp;
 use parent qw( Downloads );
 use Log::Any qw ( $log );
+use Data::Dumper;
 
 sub new {
     my $class = shift;
@@ -78,10 +79,12 @@ sub processTv {
         
         if ($bestScore and $bestMatch) {
             $log->info("\t\tDetermined this an episode of $bestMatch");
-            my ($season, $episode, $ext) = $self->getEpisodeDetails($fileNoPath);
+            my ($season, $episodes, $ext) = $self->getEpisodeDetails($fileNoPath);
             
-            if ( $season and $episode and $ext ) {
-                my $destFileName = 'Episode '.$season.'x'.$episode.'.'.$ext;
+            if ( $season and $episodes and $ext ) {
+                @{$episodes} = map { $season.'x'.$_ } @{$episodes};
+                  
+                my $destFileName = 'Episode '.join(' ', @{$episodes}).'.'.$ext;
                 my $destFile = $self->{tvShowDir}.'/'.$bestMatch.'/Season '.$season.'/'.$destFileName;
                 
                 $self->storeFile($file, $destFile);
@@ -123,14 +126,14 @@ sub getShows {
 sub getEpisodeDetails {
     my $self = shift;
     my $file = shift || die "No file supplied to getEpisodeDetails()\n";
-    my ($season, $episode, $ext);
+    my ($season, $episodes, $ext);
     
     #Remove the SD/HD indicators to simplify the Season/Episode regex
     $file =~ s/720|1080//;
 
-    if ( $file =~ m/(?|
+    if ( my @epdetails = $file =~ m/(?|
                     #matches S01E01 notations:
-                    s(\d\d?)\s?e(\d\d?(?:\DE?\d\d?)*).*\.(\w\w\w)$|
+                    s(\d\d?)\s?e(\d\d?)(?:e(\d\d?))?.*\.(\w\w\w)$|
                     
                     #matches 1x01 or 10 x 01 or 10 x1 or 10x 1 etc
                     (\d\d?)\s?x\s?(\d\d?(?:\DE?\d\d?)*).*\.(\w\w\w)$|
@@ -139,18 +142,21 @@ sub getEpisodeDetails {
                     \D(\d)(\d\d)\D.*\.(\w\w\w)$               
                     )/xi
     ) {
-        $season  = $1;
-        $episode = $2;
-        $ext     = $3;
+        $season   = shift(@epdetails);
+        $ext      = pop(@epdetails);
+        $episodes = \@epdetails;
+        
+        #Remove any undefs
+        @{$episodes} = grep { $_ } @{$episodes};
         
         #Remove any leading 0's
         $season  =~ s/^0+//;
-        $episode =~ s/^0+//;
+        @{$episodes} = map { (my $e = $_) =~ s/^0//; $e; } @{$episodes};
         
-        $log->info("\t\tTV: This is episode $episode of Season $season");
+        $log->info("\t\tTV: This is episode ".join(' and ', @{$episodes})." of Season $season");
     }
     
-    return ($season, $episode, $ext);
+    return ($season, $episodes, $ext);
 }
 
 
