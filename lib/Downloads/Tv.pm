@@ -84,7 +84,7 @@ sub processTv {
             if ( $season and $episodes and $ext ) {
                 @{$episodes} = map { $season.'x'.$_ } @{$episodes};
                   
-                my $destFileName = 'Episode '.join(' ', @{$episodes}).'.'.$ext;
+                my $destFileName = 'Episode '.join(' - ', @{$episodes}).'.'.$ext;
                 my $destFile = $self->{tvShowDir}.'/'.$bestMatch.'/Season '.$season.'/'.$destFileName;
                 
                 $self->storeFile($file, $destFile);
