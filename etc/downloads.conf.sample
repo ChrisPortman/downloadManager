@@ -25,7 +25,7 @@ delugePort = 8112
 delugePass = %%ADMIN_PASS%%
 
 #Seed Options
-seedTrackers = tracker.ipt.af, tracker.iptorrents.com, tracker.iptorrents.me, tracker.iptorrents.ru
+seedTrackers = tracker.ipt.af, tracker.iptorrents.com, tracker.iptorrents.me, tracker.iptorrents.ru, sync.empirehost.me
 
 #Mailer options
 mailHelo = %%SMTP_HELO%% 
